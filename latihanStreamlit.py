@@ -3,21 +3,25 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Variable csv
-customer_dataset_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/customers_dataset.csv');
-geolocation_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/geolocation_dataset.csv');
-order_items_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_items_dataset.csv');
-order_payemnts_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_payments_dataset.csv');
-order_reviews_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_reviews_dataset.csv');
-orders_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/orders_dataset.csv');
-product_category_translate_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/product_category_name_translation.csv');
-products_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/products_dataset.dcsv');
-sellers_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/sellers_dataset.dcsv');
+# Variable csv yang sudah dicleaning
+final_df_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/final_df_join.csv');
+
+freight_value_per_city = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/freight_value_per_city.csv');
+
+freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/freight_value_products_category.csv');
+
+order_products_all_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_products_all_df.csv');
+
+product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/product_translated_not_null.csv');
+
+products_all_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/products_all_join.csv');
+
+reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/reviews_products_category.csv');
 
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-tab1, tab2, tab3 = st.tabs(['Our Team', 'Product & Payment Type', 'Profit'])
+tab1, farhanTab, tab3 = st.tabs(['Our Team', 'Product & Payment Type', 'Profit'])
 
 with tab1 :
     file = st.file_uploader('Unggah File', type='csv')
@@ -28,35 +32,74 @@ with tab1 :
         st.write('Isi dari Dataframe adalah : ')
         st.dataframe(Data)
 
-with tab2: 
+# Fungsi untuk menampilkan angka pada bar chart
+def addNumbers(bars):
+  for bar in bars:
+    # Mengambil lebar bar chart
+    height = bar.get_height()
+
+    # Menambahkan label di ujung bar
+    plt.text(
+        bar.get_x() + bar.get_width() / 2, # Menampilkan label di tengah bar
+        height + 0.1,
+        f'{int(height)}',
+        ha = 'center',
+        va = 'bottom',
+        color='black',
+    )
+
+with farhanTab: 
     if file is not None:
-        Data['Order Date'] = pd.to_datetime(Data['Order Date'])
+        # Menghitung banyaknya produk yg terjual
+        groupby_product = order_products_all_df.groupby('product_category_name_english')['order_item_id'].count().reset_index()
+
+        groupby_product.head()
         
-        # Tambah attribute 
-        Data['Month'] = Data['Order Date'].dt.month
-        Data['Year'] = Data['Order Date'].dt.year
+        # Mengurutkan order_item_id secara Descending
+        groupby_product = groupby_product.sort_values       (by='order_item_id', ascending=False)
 
-        # Filter Data Tahun 2015
-        Data_2015 = Data[Data['Year'] == 2015]
-        Data_2015
+        # groupby_product[['product_category_name_english', 'or']]
+        groupby_product
 
-        # Statistika Transaksi
-        transaksi_per_bulan = Data_2015.groupby('Month')['Sales'].count().sort_index()
-        transaksi_per_bulan
+        # Menghitung banyaknya payment_type yang dilakukan dalam membeli barang
+        groupby_payment_type = products_all_join.groupby        ('payment_type')['payment_installments'].count().reset_index        ()
 
-        # Grafik
-        bulan_list = transaksi_per_bulan.index.tolist()
-        jml_transaksi = transaksi_per_bulan.values.tolist()
+        groupby_payment_type
 
-        fig, ax = plt.subplots()
-        ax.bar(
-        bulan_list,
-        jml_transaksi
+        # Mengurutkan data secara descending
+        groupby_payment_type = groupby_payment_type.sort_values     (by='payment_installments', ascending=False)
+
+        groupby_payment_type
+
+        # Mengambil 5 sample data
+        sample_products = groupby_product.head(5)
+        sample_products
+
+
+        # Mendefinisikan sumbu x dan y serta colornya
+        colors = [
+            '#0E98BA',
+            'lightblue', 'lightblue',
+            'lightblue', 'lightblue',
+            'lightblue', 'lightblue',
+            'lightblue', 'lightblue',
+            'lightblue']
+        x = sample_products['product_category_name_english']
+        y = sample_products['order_item_id']
+
+
+        bars = plt.bar(
+            x,
+            y,
+            color=colors
         )
-        ax.set_xlabel('Jumlah Transaksi Per Bulan Selama Tahun 2015')
-        ax.set_ylabel('Bulan')
-        ax.set_title('Jumlah Transaksi')
-        st.pyplot(fig)
+
+        addNumbers(bars)
+
+        plt.xlabel('Produk')
+        plt.ylabel('Jumlah Beli')
+        plt.xticks(rotation=30)
+        plt.show()
 
 with tab3: 
     if file is not None:
