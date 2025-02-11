@@ -4,33 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Variable csv yang sudah dicleaning
-final_df_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/final_df_join.csv');
-
-freight_value_per_city = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/freight_value_per_city.csv');
-
-freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/freight_value_products_category.csv');
-
-order_products_all_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_products_all_df.csv');
-
-product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/product_translated_not_null.csv');
-
-products_all_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/products_all_join.csv');
-
-reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/reviews_products_category.csv');
-
+freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/freight_value_products_category.csv');
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-tab1, farhanTab, tab3 = st.tabs(['Our Team', 'Product & Payment Type', 'Profit'])
-
-with tab1 :
-    file = st.file_uploader('Unggah File', type='csv')
-    if file is not None:
-        Data = pd.read_csv(file)
-
-        # Tampilkan isi dataframe   
-        st.write('Isi dari Dataframe adalah : ')
-        st.dataframe(Data)
+farhanTab, tab3 = st.tabs(['Product & Payment Type', 'Profit'])
 
 # Fungsi untuk menampilkan angka pada bar chart
 def addNumbers(bars):
@@ -49,72 +27,82 @@ def addNumbers(bars):
     )
 
 with farhanTab: 
-    if file is not None:
-        # Menghitung banyaknya produk yg terjual
-        groupby_product = order_products_all_df.groupby('product_category_name_english')['order_item_id'].count().reset_index()
+    order_products_all_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv');
 
-        groupby_product.head()
-        
-        # Mengurutkan order_item_id secara Descending
-        groupby_product = groupby_product.sort_values       (by='order_item_id', ascending=False)
+    products_all_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/products_all_join.csv');
 
-        # groupby_product[['product_category_name_english', 'or']]
-        groupby_product
+    # Menghitung banyaknya produk yg terjual
+    groupby_product = order_products_all_df.groupby('product_category_name_english')['order_item_id'].count().reset_index()
 
-        # Menghitung banyaknya payment_type yang dilakukan dalam membeli barang
-        groupby_payment_type = products_all_join.groupby        ('payment_type')['payment_installments'].count().reset_index        ()
+    # Mengurutkan order_item_id secara Descending
+    groupby_product = groupby_product.sort_values       (by='order_item_id', ascending=False)
 
-        groupby_payment_type
-
-        # Mengurutkan data secara descending
-        groupby_payment_type = groupby_payment_type.sort_values     (by='payment_installments', ascending=False)
-
-        groupby_payment_type
-
-        # Mengambil 5 sample data
-        sample_products = groupby_product.head(5)
-        sample_products
+    # groupby_product[['product_category/_name_english', 'or']]
 
 
-        # Mendefinisikan sumbu x dan y serta colornya
-        colors = [
-            '#0E98BA',
-            'lightblue', 'lightblue',
-            'lightblue', 'lightblue',
-            'lightblue', 'lightblue',
-            'lightblue', 'lightblue',
-            'lightblue']
-        x = sample_products['product_category_name_english']
-        y = sample_products['order_item_id']
+    # Menghitung banyaknya payment_type yang dilakukan dalam membeli barang
+    groupby_payment_type = products_all_join.groupby        ('payment_type')['payment_installments'].count().reset_index()
 
 
-        bars = plt.bar(
-            x,
-            y,
-            color=colors
-        )
+    # Mengurutkan data secara descending
+    groupby_payment_type = groupby_payment_type.sort_values     (by='payment_installments', ascending=False)
 
-        addNumbers(bars)
 
-        plt.xlabel('Produk')
-        plt.ylabel('Jumlah Beli')
-        plt.xticks(rotation=30)
-        plt.show()
+    # Mengambil 5 sample data
+    sample_products = groupby_product.head(5)
 
-with tab3: 
-    if file is not None:
-        Kategori_Profit = Data.groupby('Category')['Profit'].sum().sort_values()
-        Kategori_Profit
+    # Bar Chart Pertanyaan 1
+    # Mendefinisikan sumbu x dan y serta colornya
+    colors = [
+        '#0E98BA',
+        'lightblue', 'lightblue',
+        'lightblue', 'lightblue',
+        'lightblue', 'lightblue',
+        'lightblue', 'lightblue',
+        'lightblue']
+    x = sample_products['product_category_name_english']
+    y = sample_products['order_item_id']
 
-        Kategori_List = Kategori_Profit.index.tolist()
-        Profit_List = Kategori_Profit.values.tolist()
+    
+    fig, ax = plt.subplots()
+    bars = ax.bar(x, y, color=colors)
+    addNumbers(bars)
 
-        fig, ax = plt.subplots()
-        ax.pie(
-            Profit_List,
-            labels = Kategori_List,
-            autopct = '%1.1f%%'
-        )
+    ax.set_xlabel('Produk')
+    ax.set_ylabel('Jumlah Beli')
+    plt.xticks(rotation=30)
+    st.pyplot(fig)
 
-        ax.set_title('Profit Berdasarkan Kategori Produk')
-        st.pyplot(fig)
+    # Bar Chart Pertanyaan 2
+    # Mendefinisikan sumbu x dan y serta colornya
+    colors = [
+        '#0E98BA',
+        '#0E98BA', '#0E98BA',
+        'lightblue', 'lightblue',
+        'lightblue', 'lightblue',
+        'lightblue', 'lightblue',
+        'lightblue']
+    
+    fig1, ax1 = plt.subplots()
+    bars = ax1.bar(x, y, color=colors)
+    addNumbers(bars)
+
+    ax1.set_xlabel('Produk')
+    ax1.set_ylabel('Jumlah Beli')
+    plt.xticks(rotation=30)
+    st.pyplot(fig1)
+
+    # Pie chart
+    fig2, ax2 = plt.subplots(figsize=(6, 6))  # Set ukuran figure
+    selected_payment_type = groupby_payment_type.head(4)
+
+    explode = (0.1, 0, 0, 0)  # Memisahkan potongan pertama
+    ax2.pie(
+        selected_payment_type['payment_installments'],
+        explode=explode,
+        labels=selected_payment_type['payment_type'].unique(),
+        autopct='%1.1f%%',
+        shadow=True,
+    )
+    ax2.set_title('Persentase Payment Type yang Digunakan')  # Set judul pie chart
+    st.pyplot(fig2)  # Tampilkan pie chart
