@@ -3,9 +3,22 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-st.title('Analisis Sample Superstore Data')
+# Variable csv
+customer_dataset_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/customers_dataset.csv');
+geolocation_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/geolocation_dataset.csv');
+order_items_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_items_dataset.csv');
+order_payemnts_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_payments_dataset.csv');
+order_reviews_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/order_reviews_dataset.csv');
+orders_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/orders_dataset.csv');
+product_category_translate_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/product_category_name_translation.csv');
+products_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/products_dataset.dcsv');
+sellers_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/E-Commerce-Public-Dataset/sellers_dataset.dcsv');
 
-tab1, tab2, tab3 = st.tabs(['Unggah File', 'Analisis Data', 'Profit'])
+
+st.title('Analisis Dataset E-Commerce Public Dataset')
+
+tab1, tab2, tab3 = st.tabs(['Our Team', 'Product & Payment Type', 'Profit'])
+
 with tab1 :
     file = st.file_uploader('Unggah File', type='csv')
     if file is not None:
@@ -17,8 +30,6 @@ with tab1 :
 
 with tab2: 
     if file is not None:
-        # Data = pd.read_csv(file)
-        # Mengubah tipe data
         Data['Order Date'] = pd.to_datetime(Data['Order Date'])
         
         # Tambah attribute 
