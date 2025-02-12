@@ -220,7 +220,14 @@ with idinTab:
     st.pyplot(fig1)
 
 with ikhsanTab:
-    product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv')
-    reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
-    orders_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/orders_df.csv')
-    
+    items_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/items_products_category.csv')
+    items_sellers = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/items_sellers.csv')
+
+
+    # Menghitung total freight_value untuk setiap product_id
+    freight_value_per_product = items_products_category.groupby("product_id")["freight_value"].sum().reset_index()  
+
+    # Menggabungkan kembali dengan tabel produk dan kategori untuk mendapatkan informasi tambahan
+    freight_value_products = pd.merge(freight_value_per_product, products_df, on="product_id", how="inner")
+    freight_value_products_category = pd.merge(freight_value_products, product_category_name_df, on="product_category_name", how="inner")
+
