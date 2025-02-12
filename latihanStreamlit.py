@@ -8,7 +8,7 @@ freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-farhanTab,idinTab,ikhsanTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status', 'Review Score & Freight_value'])
+farhanTab,idinTab,ikhsanTab,faishalTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status', 'Review Score & Freight value', 'Most Expensive and Most Cheap Product'])
 
 
 # Fungsi untuk menampilkan angka pada bar chart
@@ -222,12 +222,137 @@ with idinTab:
 with ikhsanTab:
     items_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/items_products_category.csv')
     items_sellers = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/items_sellers.csv')
+    freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/freight_value_products_category.csv')
+    reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
+    freight_value_per_city = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/freight_value_per_city.csv')
 
+    #nomor 1
+    # filter data review_score yang bernilai 1 sampai 5
+    low_score_products_1 = reviews_products_category[reviews_products_category["review_score"] == 1]
+    low_score_products_2 = reviews_products_category[reviews_products_category["review_score"] == 2]
+    low_score_products_3 = reviews_products_category[reviews_products_category["review_score"] == 3]
+    low_score_products_4 = reviews_products_category[reviews_products_category["review_score"] == 4]
+    low_score_products_5 = reviews_products_category[reviews_products_category["review_score"] == 5]
 
+    # menghitung jumlah produk bernilai 1 sampai 5
+    product_count_1 = low_score_products_1["product_id"].nunique()
+    product_count_2 = low_score_products_2["product_id"].nunique()
+    product_count_3 = low_score_products_3["product_id"].nunique()
+    product_count_4 = low_score_products_4["product_id"].nunique()
+    product_count_5 = low_score_products_5["product_id"].nunique()
+
+    #Bar Chart nomor 1
+    # Data dari hasil perhitungan
+    scores = [1, 2, 3, 4, 5]
+    product_counts = [product_count_1, product_count_2, product_count_3, product_count_4, product_count_5]
+
+    # Pewarnaan khusus untuk review_score = 5
+    colors = ['grey', 'grey', 'grey', 'grey', 'orange']  # Warna berbeda untuk score 5
+
+    # Membuat barchart
+    fig1, ax1 = plt.subplots(figsize=(8, 5))
+    ax1.bar(scores, product_counts, color=colors, edgecolor="black")
+
+    # Menambahkan detail ke grafik
+    ax1.set_title("Distribusi Jumlah Produk Berdasarkan Review Score Yang Bernilai 5(orange)", fontsize=14)
+    ax1.set_xlabel("Review Score", fontsize=12)
+    ax1.set_ylabel("Jumlah Produk", fontsize=12)
+    plt.xticks(scores)  # Menampilkan angka 1-5 pada sumbu x
+    ax1.grid(axis='y', linestyle='--', alpha=0.7)  # Grid horizontal untuk estetika
+
+    # Menampilkan nilai di atas setiap bar
+    for i, count in enumerate(product_counts):
+        ax1.text(scores[i], count + 2, str(count), ha='center', fontsize=10)
+
+    # Menampilkan plot
+    st.pyplot(fig1)
+
+    #Nomor 2
     # Menghitung total freight_value untuk setiap product_id
     freight_value_per_product = items_products_category.groupby("product_id")["freight_value"].sum().reset_index()  
 
-    # Menggabungkan kembali dengan tabel produk dan kategori untuk mendapatkan informasi tambahan
-    freight_value_products = pd.merge(freight_value_per_product, products_df, on="product_id", how="inner")
-    freight_value_products_category = pd.merge(freight_value_products, product_category_name_df, on="product_category_name", how="inner")
+    # Mengurutkan data berdasarkan freight_value dan mengambil 3 produk teratas
+    top_3_freight = freight_value_products_category.sort_values(by="freight_value", ascending=False).head(3)
+    
+    #Bar chart nomor 2
+    fig2, ax2 = plt.subplots(figsize=(8, 5))
+    ax2.bar(top_3_freight["product_category_name_english"], top_3_freight["freight_value"], color="orange")
+    ax2.set_title("Top 3 Produk dengan Freight Value Tertinggi", fontsize=16)
+    ax2.set_xlabel("Kategori Produk", fontsize=12)
+    ax2.set_ylabel("Total Freight Value", fontsize=12)
+    plt.xticks(rotation=45)
+    ax2.grid(axis='y', linestyle='--', alpha=0.7)  # Grid horizontal untuk estetika
+    plt.tight_layout()
 
+    # Menampilkan plot
+    st.pyplot(fig2)
+
+    #nomor 3
+    # Menghitung rata-rata freight_value untuk setiap seller_city
+    freight_value_per_city = items_sellers.groupby("seller_city")["freight_value"].mean().reset_index()
+
+    # Mengurutkan data berdasarkan rata-rata freight_value secara descending dan mengambil 5 kota teratas
+    top_5_cities = freight_value_per_city.sort_values(by="freight_value", ascending=False).head(5)
+    top_5_cities_df = top_5_cities
+
+    #Bar chart nomor 3
+    fig3, ax3 = plt.subplots(figsize=(8, 5))
+    ax3.bar(top_5_cities_df["seller_city"], top_5_cities_df["freight_value"], color="blue")
+    ax3.set_title("5 Kota dengan Rata-Rata Freight Value Terbesar", fontsize=16)
+    ax3.set_xlabel("Kota", fontsize=12)
+    ax3.set_ylabel("Rata-Rata Freight Value", fontsize=12)
+    plt.xticks(rotation=45)
+    ax3.grid(axis='y', linestyle='--', alpha=0.7)  # Grid horizontal untuk estetika
+    plt.tight_layout()
+    
+    # Menampilkan plot
+    st.pyplot(fig3)
+
+with faishalTab:
+   product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/product_translated_not_null.csv')
+
+   max_harga = product_translated_not_null['price'].max()
+   final_result_max = product_translated_not_null[product_translated_not_null['price'] == max_harga].head(1)
+
+   min_harga = product_translated_not_null['price'].min()
+   final_result_min = product_translated_not_null[product_translated_not_null['price'] == min_harga].head(1)
+
+   # Urutkan data berdasarkan harga (price) secara descending
+   productTranslated_no_duplicates_sorted_desc = product_translated_not_null.sort_values(by='price', ascending=False)
+
+   # Ambil 10 data dengan harga tertinggi
+   top_10_highest_price = productTranslated_no_duplicates_sorted_desc.head(14)
+
+   # Membuat horizontal bar chart
+   fig1, ax1 = plt.subplots(figsize=(12, 6))
+   ax1.bar(top_10_highest_price['product_category_name_english'], top_10_highest_price['price'], color='skyblue')
+
+   # Menambahkan label dan judul
+   ax1.set_xlabel('Nama Produk', fontsize=12)
+   ax1.set_ylabel('Harga Produk', fontsize=12)
+   ax1.set_title('Bar Chart 10 Produk dengan Harga Tertinggi', fontsize=14)
+   plt.xticks(rotation=90, fontsize=10)
+   plt.tight_layout()
+
+   # Tampilkan grafik
+   st.pyplot(fig1)
+
+   # Urutkan data berdasarkan harga (price) secara ascending
+   productTranslated_no_duplicates_sorted_asc = product_translated_not_null.sort_values(by='price', ascending=True)
+
+   # Ambil 10 data dengan harga terendah
+   top_10_lowest_price = productTranslated_no_duplicates_sorted_asc.head(45)
+
+   # Plotting
+   fig2, ax2 = plt.subplots(figsize=(12, 6))
+   ax2.bar(top_10_lowest_price['product_category_name_english'], top_10_lowest_price['price'], color='skyblue')
+
+   # Menambahkan label dan judul
+   ax2.set_xlabel('Nama Produk', fontsize=12)
+   ax2.set_ylabel('Harga Produk', fontsize=12)
+   ax2.set_title('Bar Chart 10 Produk dengan Harga Terendah', fontsize=14)
+   plt.xticks(rotation=90, fontsize=10)
+   plt.tight_layout()
+
+   # Tampilkan grafik
+   st.pyplot(fig2)
