@@ -8,7 +8,8 @@ freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-farhanTab, tab3 = st.tabs(['Product & Payment Type', 'Profit'])
+farhanTab,idinTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status'])
+
 
 # Fungsi untuk menampilkan angka pada bar chart
 def addNumbers(bars):
@@ -106,3 +107,26 @@ with farhanTab:
     )
     ax2.set_title('Persentase Payment Type yang Digunakan')  # Set judul pie chart
     st.pyplot(fig2)  # Tampilkan pie chart
+
+
+with idinTab:
+    product_translated_not_null = pd.read('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv')
+    reviews_products_category = pd.read('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
+    
+
+    # melakukan join dengan inner join
+    reviews_products_category = pd.merge(reviews_products, product_category_name_df, on="product_category_name", how="inner")
+
+    # filter data review_score yang bernilai 1 sampai 5
+    low_score_products_1 = reviews_products_category[reviews_products_category["review_score"] == 1]
+    low_score_products_2 = reviews_products_category[reviews_products_category["review_score"] == 2]
+    low_score_products_3 = reviews_products_category[reviews_products_category["review_score"] == 3]
+    low_score_products_4 = reviews_products_category[reviews_products_category["review_score"] == 4]
+    low_score_products_5 = reviews_products_category[reviews_products_category["review_score"] == 5]
+
+    # menghitung jumlah produk bernilai 1 sampai 5
+    product_count_1 = low_score_products_1["product_id"].nunique()
+    product_count_2 = low_score_products_2["product_id"].nunique()
+    product_count_3 = low_score_products_3["product_id"].nunique()
+    product_count_4 = low_score_products_4["product_id"].nunique()
+    product_count_5 = low_score_products_5["product_id"].nunique()
