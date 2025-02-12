@@ -8,7 +8,7 @@ freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-farhanTab,idinTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status'])
+farhanTab,idinTab,ikhsanTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status', 'Review Score & Freight_value'])
 
 
 # Fungsi untuk menampilkan angka pada bar chart
@@ -165,7 +165,8 @@ with idinTab:
     colors = ['red', 'orange', 'yellow', 'green', 'blue']  # Warna untuk setiap skor
     explode = [0.1 if score == 1 else 0 for score in labels]  # Membedakan slice untuk skor 1
 
-    fig, ax = plt.subplots(figsize=(8, 8)) 
+    fig, ax = plt.subplots(figsize=(8, 8))
+
     # Membuat pie chart
     ax.pie(
         sizes,
@@ -217,3 +218,9 @@ with idinTab:
     # Menampilkan plot
     # plt.tight_layout()
     st.pyplot(fig1)
+
+with ikhsanTab:
+    product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv')
+    reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
+    orders_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/orders_df.csv')
+    
