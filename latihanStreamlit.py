@@ -110,12 +110,10 @@ with farhanTab:
 
 
 with idinTab:
-    product_translated_not_null = pd.read('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv')
-    reviews_products_category = pd.read('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
+    product_translated_not_null = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv')
+    reviews_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/reviews_products_category.csv')
+    orders_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/orders_df.csv')
     
-
-    # melakukan join dengan inner join
-    reviews_products_category = pd.merge(reviews_products, product_category_name_df, on="product_category_name", how="inner")
 
     # filter data review_score yang bernilai 1 sampai 5
     low_score_products_1 = reviews_products_category[reviews_products_category["review_score"] == 1]
@@ -130,3 +128,92 @@ with idinTab:
     product_count_3 = low_score_products_3["product_id"].nunique()
     product_count_4 = low_score_products_4["product_id"].nunique()
     product_count_5 = low_score_products_5["product_id"].nunique()
+
+    # filter data order_status
+    order_status_1 = orders_df[orders_df["order_status"] == "delivered"]
+    order_status_2 = orders_df[orders_df["order_status"] == "shipped"]
+    order_status_3 = orders_df[orders_df["order_status"] == "canceled"]
+    order_status_4 = orders_df[orders_df["order_status"] == "unavailable"]
+    order_status_5 = orders_df[orders_df["order_status"] == "created"]
+    order_status_6 = orders_df[orders_df["order_status"] == "invoiced"]
+    order_status_7 = orders_df[orders_df["order_status"] == "processing"]
+    order_status_8 = orders_df[orders_df["order_status"] == "approved"]
+
+    # menghitung jumlah tiap order_status
+    order_status_count_1 = order_status_1["order_id"].nunique()
+    order_status_count_2 = order_status_2["order_id"].nunique()
+    order_status_count_3 = order_status_3["order_id"].nunique()
+    order_status_count_4 = order_status_4["order_id"].nunique()
+    order_status_count_5 = order_status_5["order_id"].nunique()
+    order_status_count_6 = order_status_6["order_id"].nunique()
+    order_status_count_7 = order_status_7["order_id"].nunique()
+    order_status_count_8 = order_status_8["order_id"].nunique()
+
+    # Soal nomor 1
+    # Menghitung distribusi review_score
+    review_score_counts = reviews_products_category["review_score"].value_counts()
+
+    # Total review
+    total_reviews = review_score_counts.sum()
+
+    # Persentase review untuk setiap skor
+    review_score_percentages = (review_score_counts / total_reviews) * 100
+
+    # Pie chart
+    labels = review_score_counts.index  # Skor review (1, 2, 3, 4, 5)
+    sizes = review_score_percentages   # Persentase untuk setiap skor
+    colors = ['red', 'orange', 'yellow', 'green', 'blue']  # Warna untuk setiap skor
+    explode = [0.1 if score == 1 else 0 for score in labels]  # Membedakan slice untuk skor 1
+
+    fig, ax = plt.subplots(figsize=(8, 8)) 
+    # Membuat pie chart
+    ax.pie(
+        sizes,
+        labels=labels,
+        autopct='%1.1f%%',
+        startangle=90,
+        colors=colors,
+        explode=explode,
+        shadow=True
+    )
+    plt.title("Review Score yang bernilai 1 dalam Persentase")
+    st.pyplot(fig)
+
+
+    # Data untuk horizontal bar chart
+    status_labels = [
+        "delivered", "shipped", "canceled",
+        "unavailable", "created", "invoiced",
+        "processing", "approved"
+    ]
+
+    status_counts = [
+        order_status_count_1, order_status_count_2, order_status_count_3,
+        order_status_count_4, order_status_count_5, order_status_count_6,
+        order_status_count_7, order_status_count_8
+    ]
+
+    # Menghitung total dan persentase
+    total_orders = sum(status_counts)
+    status_percentages = [(count / total_orders) * 100 for count in status_counts]
+
+    # Membuat horizontal bar chart
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+
+    ax1.barh(status_labels, status_percentages, color=plt.cm.Paired.colors)
+
+    # Menambahkan judul dan label
+    ax1.set_title("Persentase Order Berdasarkan Status", fontsize=14)
+    ax1.set_xlabel("Persentase (%)", fontsize=12)
+    ax1.set_ylabel("Order Status", fontsize=12)
+
+    # Menambahkan nilai persentase pada bar
+    for i, v in enumerate(status_percentages):
+        ax1.text(v + 0.5, i, f"{v:.1f}%", fontsize=10, va='center')
+
+    # Menampilkan grid pada sumbu x
+    ax1.grid(axis='x', linestyle='--', alpha=0.7)
+
+    # Menampilkan plot
+    # plt.tight_layout()
+    st.pyplot(fig1)
