@@ -429,7 +429,7 @@ with dwiTab:
    st.pyplot(fig2)
 
 with rizqiTab:
-   product_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/product_df.csv')
+   products_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/products_df.csv')
 
    # Hitung rata-rata dimensi
    products_df['average_dimension'] = (products_df['product_length_cm'] + products_df['product_width_cm'] + products_df['product_height_cm']) / 3
