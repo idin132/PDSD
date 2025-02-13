@@ -8,7 +8,7 @@ freight_value_products_category = pd.read_csv('https://raw.githubusercontent.com
 
 st.title('Analisis Dataset E-Commerce Public Dataset')
 
-farhanTab,idinTab,ikhsanTab,faishalTab= st.tabs(['Product & Payment Type', 'Review Score & Order Status', 'Review Score & Freight value', 'Most Expensive and Most Cheap Product'])
+homepageTab, farhanTab, idinTab, ikhsanTab, faishalTab, dwiTab, rizqiTab = st.tabs(['Main Page', 'Product & Payment Type', 'Review Score & Order Status', 'Review Score & Freight value', 'Most Expensive and Most Cheap Product','Cities with the Highest and Lowest Orders', 'Product Average'])
 
 
 # Fungsi untuk menampilkan angka pada bar chart
@@ -26,6 +26,18 @@ def addNumbers(bars):
         va = 'bottom',
         color='black',
     )
+
+with homepageTab:
+    st.html(
+        "<p style='text-align: center; text-decoration: underline'>Team 5 Pemrograman Dasar Sains Data</p>"
+    )
+    col1, col2 = st.columns(2);
+    col1.image('./our-images/farhanPhoto.jpg', width=250)
+    col1.image('./our-images/agiPhoto.jpg', width=250)
+    col2.image('./our-images/ikhsanPhoto.jpg', width=250)
+    col1.image('./our-images/faishalPhoto.jpg', width=250)
+    col2.image('./our-images/idinPhoto.jpg', width=250)
+    col2.image('./our-images/rizqiPhoto.jpg', width=250)
 
 with farhanTab: 
     order_products_all_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/order_products_all_df.csv');
@@ -69,6 +81,7 @@ with farhanTab:
     bars = ax.bar(x, y, color=colors)
     addNumbers(bars)
 
+    ax.set_title('Produk dengan Pembelian Tertinggi')
     ax.set_xlabel('Produk')
     ax.set_ylabel('Jumlah Beli')
     plt.xticks(rotation=30)
@@ -88,6 +101,7 @@ with farhanTab:
     bars = ax1.bar(x, y, color=colors)
     addNumbers(bars)
 
+    ax1.set_title('3 Produk dengan Pembelian Tertinggi')
     ax1.set_xlabel('Produk')
     ax1.set_ylabel('Jumlah Beli')
     plt.xticks(rotation=30)
@@ -218,6 +232,8 @@ with idinTab:
     # Menampilkan plot
     # plt.tight_layout()
     st.pyplot(fig1)
+
+    st.text('')
 
 with ikhsanTab:
     items_products_category = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/items_products_category.csv')
@@ -356,3 +372,78 @@ with faishalTab:
 
    # Tampilkan grafik
    st.pyplot(fig2)
+
+with dwiTab:
+   final_df_join = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/final_df_join.csv')
+
+   # Pertanyaan 1
+   # Filter data untuk kategori "perfumery"
+   parfum_orders = final_df_join[final_df_join['product_category_name_english'].str.lower() == 'perfumery']
+
+   # Hitung jumlah order per kota
+   orders_by_city = parfum_orders.groupby('seller_city')['order_id'].count().reset_index()
+
+   # Urutkan kota berdasarkan jumlah order tertinggi
+   orders_by_city = orders_by_city.sort_values(by='order_id', ascending=False)
+
+   # Pertanyaan 2
+   # Filter data untuk kategori "furniture_decor"
+   furniture_orders = final_df_join[final_df_join['product_category_name_english'].str.lower() == 'furniture_decor']
+
+   # Hitung jumlah order per kota
+   orders_by_city = furniture_orders.groupby('seller_city')['order_id'].count().reset_index()
+
+   # Urutkan kota berdasarkan jumlah order tertinggi
+   orders_by_city = orders_by_city.sort_values(by='order_id', ascending=False)
+
+   # Ambil 10 kota dengan jumlah pesanan tertinggi
+   top_10_cities = orders_by_city.head(10)
+   
+   # Plotting
+   fig1, ax1 = plt.subplots(figsize=(12, 6))
+   plt.bar(top_10_cities['seller_city'], top_10_cities['order_id'], color='orange')
+   
+   # Menambahkan judul dan label
+   ax1.set_title('10 Kota dengan Pesanan Perfumery Tertinggi', fontsize=16)
+   ax1.set_xlabel('Daftar Nama Kota', fontsize=12)
+   ax1.set_ylabel('Jumlah Pesanan', fontsize=12)
+   plt.xticks(rotation=45)
+   
+   # Tampilkan grafik
+   st.pyplot(fig1)
+
+   # Ambil 10 kota dengan jumlah pesanan tertinggi
+   top_10_cities = orders_by_city.head(10)
+   
+   # Visualisasi
+   fig2, ax2 = plt.subplots(figsize=(12, 6))
+   plt.bar(top_10_cities['seller_city'], top_10_cities['order_id'], color='green')
+   
+   # Menambahkan judul dan label
+   ax2.set_title('10 Kota dengan Pesanan Furniture Decor Tertinggi', fontsize=16)
+   ax2.set_xlabel('Daftar Nama Kota', fontsize=12)
+   ax2.set_ylabel('Jumlah Pesanan', fontsize=12)
+   plt.xticks(rotation=45)
+
+   # Tampilkan grafik
+   st.pyplot(fig2)
+
+with rizqiTab:
+   product_df = pd.read_csv('https://raw.githubusercontent.com/idin132/PDSD/refs/heads/master/main-data/product_df.csv')
+
+   # Hitung rata-rata dimensi
+   products_df['average_dimension'] = (products_df['product_length_cm'] + products_df['product_width_cm'] + products_df['product_height_cm']) / 3
+
+   # Pilih beberapa data untuk visualisasi (misalnya, 10 produk pertama)
+   sample_data = products_df[['product_category_name', 'average_dimension']].head(10)
+
+   # Membuat diagram batang
+   fig1, ax1 = plt.subplots(figsize=(10, 6))
+   plt.bar(sample_data['product_category_name'], sample_data['average_dimension'], color='skyblue')
+   ax1.set_xlabel('Product Category Name', fontsize=12)
+   ax1.set_ylabel('Average Dimension (cm)', fontsize=12)
+   ax1.set_title('Rata Rata Dimensi Product', fontsize=14)
+   plt.xticks(rotation=45, ha='right')
+   plt.tight_layout()
+
+   st.pyplot(fig1)
