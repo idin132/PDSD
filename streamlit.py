@@ -50,21 +50,16 @@ with farhanTab:
     # Mengurutkan order_item_id secara Descending
     groupby_product = groupby_product.sort_values       (by='order_item_id', ascending=False)
 
-    # groupby_product[['product_category/_name_english', 'or']]
-
-
     # Menghitung banyaknya payment_type yang dilakukan dalam membeli barang
     groupby_payment_type = products_all_join.groupby        ('payment_type')['payment_installments'].count().reset_index()
-
 
     # Mengurutkan data secara descending
     groupby_payment_type = groupby_payment_type.sort_values     (by='payment_installments', ascending=False)
 
-
     # Mengambil 5 sample data
     sample_products = groupby_product.head(5)
 
-    # Bar Chart Pertanyaan 1
+    # Bar Chart Pertanyaan 1 : 
     # Mendefinisikan sumbu x dan y serta colornya
     colors = [
         '#0E98BA',
@@ -87,7 +82,7 @@ with farhanTab:
     plt.xticks(rotation=30)
     st.pyplot(fig)
 
-    # Bar Chart Pertanyaan 2
+    # Bar Chart Pertanyaan 2 : 
     # Mendefinisikan sumbu x dan y serta colornya
     colors = [
         '#0E98BA',
